@@ -16,7 +16,7 @@ with st.expander('Analyse du text'):
             blob = TextBlob(text, pos_tagger=fr_tagger, analyzer=fr_analyzer)
         else:
             blob = TextBlob(text)
-        st.write('Polarité: ', round(blob.polarity,2))
+        st.write('Polarité: ', round(blob.sentiment.polarity,2))
         st.write('Subjectivité: ', round(blob.sentiment.subjectivity,2))
 
 
