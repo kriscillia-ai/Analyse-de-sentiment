@@ -1,10 +1,7 @@
-from textblob import TextBlob
-from textblob_fr import PatternTagger, PatternAnalyzer
 import pandas as pd
 import streamlit as st
-
-fr_tagger = PatternTagger()
-fr_analyzer = PatternAnalyzer()
+from textblob import TextBlob
+from polyglot.text import Text
 
 st.header('Analyse de sentiment')
 lang = st.selectbox('Sélectionnez la langue', ['en', 'fr'])
@@ -13,30 +10,33 @@ with st.expander('Analyse du text'):
     text = st.text_input('Text ici: ')
     if text:
         if lang == 'fr':
-            blob = TextBlob(text, pos_tagger=fr_tagger, analyzer=fr_analyzer)
+            text_polyglot = Text(text, hint_language_code='fr')
+            sentiment_score = text_polyglot.polarity
+            st.write('Polarité: ', round(sentiment_score, 2))
+            st.write('Subjectivité: ', 'Non disponible')
         else:
             blob = TextBlob(text)
-        st.write('Polarité: ', round(blob.sentiment.polarity,2))
-        st.write('Subjectivité: ', round(blob.sentiment.subjectivity,2))
+            st.write('Polarité: ', round(blob.sentiment.polarity, 2))
+            st.write('Subjectivité: ', round(blob.sentiment.subjectivity, 2))
 
-
-with st.expander('Analyse CSV'):
+with st.expander('Analyze CSV'):
     upl = st.file_uploader('Téléchargement des fichiers')
 
     def score(x, lang='en'):
         if lang == 'fr':
-            blob1 = TextBlob(x, pos_tagger=fr_tagger, analyzer=fr_analyzer)
+            text_polyglot = Text(x, hint_language_code='fr')
+            return text_polyglot.polarity
         else:
             blob1 = TextBlob(x)
-        return blob1.sentiment.polarity
+            return blob1.sentiment.polarity
 
     def analyze(x):
         if x >= 0.5:
-            return 'Positif'
+            return 'Positive'
         elif x <= -0.5:
-            return 'Negatif'
+            return 'Negative'
         else:
-            return 'Neutre'
+            return 'Neutral'
 
     if upl:
         df = pd.read_excel(upl)
